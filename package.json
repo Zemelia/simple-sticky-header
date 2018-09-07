@@ -1,0 +1,25 @@
+{
+  "name": "simple-sticky-table-header",
+  "version": "0.0.3",
+  "description": "Simple Sticky Table Header",
+  "main": "SimpleStickyTableHeader.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Zemelia/simple-sticky-header.git"
+  },
+  "keywords": [
+    "table",
+    "header",
+    "sticky",
+    "vanilla JS"
+  ],
+  "author": "Oleh Raban (@Zemelia)",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/Zemelia/simple-sticky-header/issues"
+  },
+  "homepage": "https://github.com/Zemelia/simple-sticky-header#readme"
+}

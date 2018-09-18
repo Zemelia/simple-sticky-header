@@ -17,10 +17,6 @@ function stickyTableHeader(table, scrollParent = document.body) {
   let sticked = false;
   let stickyHeader = null;
   const parentBox = scrollParent.getBoundingClientRect();
-  const offsetTop = table.offsetTop;
-  const offsetLeft = table.offsetLeft;
-  let topStickOffset = offsetTop;
-  let bottomStickOffset = offsetTop + table.offsetHeight - thead.offsetHeight;
   function setWidth() {
     const headerCells = thead.getElementsByTagName('th');
     const stickyHeaderCells =  stickyHeader.getElementsByTagName('th');
@@ -39,6 +35,7 @@ function stickyTableHeader(table, scrollParent = document.body) {
     }
   }
   function prepareHeader() {
+    const offsetLeft = table.offsetLeft;
     const clonedThead = thead.cloneNode(true);
     clonedThead.classList.add('sticky-header');
     clonedThead.style.left = (offsetLeft + parentBox.left) + 'px';
@@ -50,6 +47,9 @@ function stickyTableHeader(table, scrollParent = document.body) {
     setWidth();
   }
   function eventListener (e) {
+    const offsetTop = table.offsetTop;
+    let topStickOffset = offsetTop;
+    let bottomStickOffset = offsetTop + table.offsetHeight - thead.offsetHeight;
     if (sticked !== true && (offsetTop - scrollParent.scrollTop < 0)) {
       sticked = true;
       stickyHeader.style.display = null;

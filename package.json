@@ -1,10 +1,12 @@
 {
   "name": "simple-sticky-table-header",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "description": "Simple Sticky Table Header",
-  "main": "SimpleStickyTableHeader.js",
+  "main": "./dist/SimpleStickyTableHeader.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "babel src --presets babel-preset-es2015 --out-dir dist",
+    "prepublish": "npm run build"
   },
   "repository": {
     "type": "git",
@@ -21,5 +23,10 @@
   "bugs": {
     "url": "https://github.com/Zemelia/simple-sticky-header/issues"
   },
-  "homepage": "https://github.com/Zemelia/simple-sticky-header#readme"
+  "homepage": "https://github.com/Zemelia/simple-sticky-header#readme",
+  "devDependencies": {
+    "babel-cli": "^6.26.0",
+    "babel-core": "^6.26.3",
+    "babel-preset-es2015": "^6.24.1"
+  }
 }

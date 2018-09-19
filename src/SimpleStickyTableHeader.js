@@ -16,23 +16,24 @@ function stickyTableHeader(table, scrollParent = document.body) {
   }
   let sticked = false;
   let stickyHeader = null;
+  let bodyFirstRowCells = [];
   const parentBox = scrollParent.getBoundingClientRect();
   function setWidth() {
     const headerCells = thead.getElementsByTagName('th');
     const stickyHeaderCells =  stickyHeader.getElementsByTagName('th');
-    [].forEach.call(headerCells, (cell, key) => {
-      stickyHeaderCells[key].style.width = cell.offsetWidth + 'px';
-    });
     const tbody = table.getElementsByTagName('tbody')[0];
     if (tbody) {
       const firstRow = tbody.getElementsByTagName('tr')[0];
       if (firstRow) {
-        const bodyFirstRowCells = firstRow.getElementsByTagName('td');
-        [].forEach.call(bodyFirstRowCells, (cell) => {
-          cell.style.width = cell.offsetWidth + 'px';
-        });
+        bodyFirstRowCells = firstRow.getElementsByTagName('td');
       }
     }
+    [].forEach.call(headerCells, (cell, key) => {
+      stickyHeaderCells[key].style.width = cell.offsetWidth + 'px';
+      if (bodyFirstRowCells[key]) {
+        bodyFirstRowCells[key].style.width = cell.offsetWidth + 'px';
+      }
+    });
   }
   function prepareHeader() {
     const offsetLeft = table.offsetLeft;

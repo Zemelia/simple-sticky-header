@@ -14,13 +14,14 @@ function stickyTableHeader(table, scrollParent = document.body) {
   if (!thead) {
     return
   }
-  const parentBox = scrollParent.getBoundingClientRect();
+  const headerCells = thead.getElementsByTagName('th');
   let resizeTimeout = null;
   let sticked = false;
   let stickyTable = null;
+  let widthModifier = 0;
 
   function setWidth() {
-    const headerCells = thead.getElementsByTagName('th');
+    const parentBox = scrollParent.getBoundingClientRect();
     const stickyHeaderCells =  stickyTable.getElementsByTagName('th');
 
     [].forEach.call(headerCells, (cell, key) => {
@@ -29,24 +30,31 @@ function stickyTableHeader(table, scrollParent = document.body) {
         headerCells[key].style.width = cell.offsetWidth + 'px';
       }
     });
-    // Get border width as modifier to prevent misalignment with cells.
-    const computedStyles = window.getComputedStyle(headerCells[0]);
-    const widthModifier = parseInt(computedStyles.getPropertyValue('border-left-width'), 10);
-    stickyTable.style.width = table.offsetWidth + 'px';
+    // Set sticky table head width with modifier to prevent cells missalignment.
     stickyTable.getElementsByTagName('thead')[0].style.width = (thead.offsetWidth + widthModifier) + 'px';
+    // Set sticky table dynamic styles.
+    stickyTable.style.width = table.offsetWidth + 'px';
+    stickyTable.style.left = (table.offsetLeft + parentBox.left) + 'px';
+    stickyTable.style.top = parentBox.top + 'px';
   }
 
   function prepareHeader() {
-    const offsetLeft = table.offsetLeft;
     const clonedThead = thead.cloneNode(true);
+    // Get border width as modifier to prevent misalignment with cells.
+    widthModifier = headerCells[0] ? headerCells[0].offsetWidth - headerCells[0].clientWidth : 0;
     stickyTable = document.createElement('table');
-    stickyTable.style.left = (offsetLeft + parentBox.left) + 'px';
-    stickyTable.style.top = parentBox.top + 'px';
+
+    // Set base styles for sticky table.
     stickyTable.style.position = 'fixed';
     stickyTable.style.overflow = 'hidden';
     stickyTable.style.display = 'none';
     stickyTable.classList.add('sticky-table');
+    // Set base styles for sticky table's head.
     clonedThead.style.display = 'block';
+    clonedThead.style.transition = 'none';
+    // Set base styles for sticky table head first row.
+    clonedThead.childNodes[0].style.display = 'block';
+    clonedThead.childNodes[0].style.marginBottom = -(widthModifier) + 'px';
     stickyTable.appendChild(clonedThead);
     table.parentNode.insertBefore(stickyTable, table);
     setWidth();
@@ -82,7 +90,7 @@ function stickyTableHeader(table, scrollParent = document.body) {
     clearTimeout(resizeTimeout);
     resizeTimeout = setTimeout(() => {
       setWidth();
-    }, 200);
+    }, 500);
   }
   window.addEventListener('resize', resizeDebounce);
 }

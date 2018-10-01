@@ -24,18 +24,25 @@ function stickyTableHeader(table, scrollParent = document.body) {
     const parentBox = scrollParent.getBoundingClientRect();
     const stickyHeaderCells =  stickyTable.getElementsByTagName('th');
 
+    // Refresh table cells width in case window resize, etc.
     [].forEach.call(headerCells, (cell, key) => {
-      stickyHeaderCells[key].style.width = cell.offsetWidth + 'px';
+      cell.style.width = null;
+    });
+
+    [].forEach.call(headerCells, (cell, key) => {
+      const computedCellStyle = window.getComputedStyle(cell);
+      const cellWidth = parseFloat(computedCellStyle.getPropertyValue('width'));
+      stickyHeaderCells[key].style.width = cellWidth + 'px';
       if (headerCells[key]) {
-        headerCells[key].style.width = cell.offsetWidth + 'px';
+        headerCells[key].style.width = cellWidth + 'px';
       }
     });
     // Set sticky table head width with modifier to prevent cells missalignment.
-    const computedStyle = window.getComputedStyle(thead)
-    const tableWidth = parseFloat(computedStyle.getPropertyValue('width'));
-    stickyTable.getElementsByTagName('thead')[0].style.width = (tableWidth + widthModifier) + 'px';
+    const computedTheadStyle = window.getComputedStyle(thead)
+    const theadWidth = parseFloat(computedTheadStyle.getPropertyValue('width'));
+    stickyTable.getElementsByTagName('thead')[0].style.width = (theadWidth + widthModifier) + 'px';
     // Set sticky table dynamic styles.
-    stickyTable.style.width = tableWidth + 'px';
+    stickyTable.style.width = table.offsetWidth + 'px';
     stickyTable.style.left = (table.offsetLeft + parentBox.left) + 'px';
     stickyTable.style.top = parentBox.top + 'px';
   }
@@ -51,6 +58,7 @@ function stickyTableHeader(table, scrollParent = document.body) {
     stickyTable.style.overflow = 'hidden';
     stickyTable.style.display = 'none';
     stickyTable.classList.add('sticky-table');
+    stickyTable.style.pointerEvents = 'none';
     // Set base styles for sticky table's head.
     clonedThead.style.display = 'block';
     clonedThead.style.transition = 'none';

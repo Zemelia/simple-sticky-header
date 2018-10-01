@@ -31,9 +31,11 @@ function stickyTableHeader(table, scrollParent = document.body) {
       }
     });
     // Set sticky table head width with modifier to prevent cells missalignment.
-    stickyTable.getElementsByTagName('thead')[0].style.width = (thead.offsetWidth + widthModifier) + 'px';
+    const computedStyle = window.getComputedStyle(thead)
+    const tableWidth = parseFloat(computedStyle.getPropertyValue('width'));
+    stickyTable.getElementsByTagName('thead')[0].style.width = (tableWidth + widthModifier) + 'px';
     // Set sticky table dynamic styles.
-    stickyTable.style.width = table.offsetWidth + 'px';
+    stickyTable.style.width = tableWidth + 'px';
     stickyTable.style.left = (table.offsetLeft + parentBox.left) + 'px';
     stickyTable.style.top = parentBox.top + 'px';
   }

@@ -63,8 +63,11 @@ function stickyTableHeader(table, scrollParent = document.body) {
     clonedThead.style.display = 'block';
     clonedThead.style.transition = 'none';
     // Set base styles for sticky table head first row.
-    clonedThead.childNodes[0].style.display = 'block';
-    clonedThead.childNodes[0].style.marginBottom = -(widthModifier) + 'px';
+    const clonedTheadTR = clonedThead.querySelector('tr');
+    if (clonedTheadTR) {
+      clonedTheadTR.style.display = 'block';
+      clonedTheadTR.style.marginBottom = -(widthModifier) + 'px';
+    }
     stickyTable.appendChild(clonedThead);
     table.parentNode.insertBefore(stickyTable, table);
     setWidth();

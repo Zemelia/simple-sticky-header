@@ -19,8 +19,11 @@ function stickyTableHeader(table, scrollParent = document.body) {
   let sticked = false;
   let stickyTable = null;
   let widthModifier = 0;
+  let setWidthTimeout = null
 
-  function setWidth() {
+  function setWidth(timeout = 0) {
+    clearTimeout(setWidthTimeout);
+
     const parentBox = scrollParent.getBoundingClientRect();
     const stickyHeaderCells =  stickyTable.getElementsByTagName('th');
 
@@ -29,22 +32,25 @@ function stickyTableHeader(table, scrollParent = document.body) {
       cell.style.width = null;
     });
 
-    [].forEach.call(headerCells, (cell, key) => {
-      const computedCellStyle = window.getComputedStyle(cell);
-      const cellWidth = parseFloat(computedCellStyle.getPropertyValue('width'));
-      stickyHeaderCells[key].style.width = cellWidth + 'px';
-      if (headerCells[key]) {
-        headerCells[key].style.width = cellWidth + 'px';
-      }
-    });
-    // Set sticky table head width with modifier to prevent cells missalignment.
-    const computedTheadStyle = window.getComputedStyle(thead)
-    const theadWidth = parseFloat(computedTheadStyle.getPropertyValue('width'));
-    stickyTable.getElementsByTagName('thead')[0].style.width = (theadWidth + widthModifier) + 'px';
-    // Set sticky table dynamic styles.
-    stickyTable.style.width = table.offsetWidth + 'px';
-    stickyTable.style.left = (table.offsetLeft + parentBox.left) + 'px';
-    stickyTable.style.top = parentBox.top + 'px';
+    setWidthTimeout = setTimeout(() => {
+      // Set sticky table head width with modifier to prevent cells missalignment.
+      const computedTheadStyle = window.getComputedStyle(thead)
+      const theadWidth = parseFloat(computedTheadStyle.getPropertyValue('width'));
+
+      [].forEach.call(headerCells, (cell, key) => {
+        const computedCellStyle = window.getComputedStyle(cell);
+        const cellWidth = parseFloat(computedCellStyle.getPropertyValue('width'));
+        stickyHeaderCells[key].style.width = cellWidth + 'px';
+        if (headerCells[key]) {
+          headerCells[key].style.width = cellWidth + 'px';
+        }
+      });
+      stickyTable.getElementsByTagName('thead')[0].style.width = (theadWidth + widthModifier) + 'px';
+      // Set sticky table dynamic styles.
+      stickyTable.style.width = table.offsetWidth + 'px';
+      stickyTable.style.left = (table.offsetLeft + parentBox.left) + 'px';
+      stickyTable.style.top = parentBox.top + 'px';
+    }, timeout)
   }
 
   function prepareHeader() {
@@ -59,15 +65,11 @@ function stickyTableHeader(table, scrollParent = document.body) {
     stickyTable.style.display = 'none';
     stickyTable.classList.add('sticky-table');
     stickyTable.style.pointerEvents = 'none';
+
     // Set base styles for sticky table's head.
     clonedThead.style.display = 'block';
     clonedThead.style.transition = 'none';
-    // Set base styles for sticky table head first row.
-    const clonedTheadTR = clonedThead.querySelector('tr');
-    if (clonedTheadTR) {
-      clonedTheadTR.style.display = 'block';
-      clonedTheadTR.style.marginBottom = -(widthModifier) + 'px';
-    }
+
     stickyTable.appendChild(clonedThead);
     table.parentNode.insertBefore(stickyTable, table);
     setWidth();
@@ -102,7 +104,7 @@ function stickyTableHeader(table, scrollParent = document.body) {
   function resizeDebounce() {
     clearTimeout(resizeTimeout);
     resizeTimeout = setTimeout(() => {
-      setWidth();
+      setWidth(300);
     }, 500);
   }
   window.addEventListener('resize', resizeDebounce);

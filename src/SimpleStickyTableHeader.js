@@ -21,16 +21,21 @@ function stickyTableHeader(table, scrollParent = document.body) {
   let widthModifier = 0;
   let setWidthTimeout = null
 
-  function setWidth(timeout = 0) {
+  function setWidth(timeout = 0, initial = false) {
     clearTimeout(setWidthTimeout);
 
     const parentBox = scrollParent.getBoundingClientRect();
     const stickyHeaderCells =  stickyTable.getElementsByTagName('th');
 
     // Refresh table cells width in case window resize, etc.
-    [].forEach.call(headerCells, (cell, key) => {
-      cell.style.width = null;
-    });
+      [].forEach.call(headerCells, (cell, key) => {
+        if (initial && cell.style.width) {
+          cell.setAttribute('data-width', cell.style.width)
+        }
+        else if (!cell.getAttribute('data-width')) {
+          cell.style.width = null;
+        }
+      });
 
     setWidthTimeout = setTimeout(() => {
       // Set sticky table head width with modifier to prevent cells missalignment.
@@ -41,7 +46,7 @@ function stickyTableHeader(table, scrollParent = document.body) {
         const computedCellStyle = window.getComputedStyle(cell);
         const cellWidth = parseFloat(computedCellStyle.getPropertyValue('width'));
         stickyHeaderCells[key].style.width = cellWidth + 'px';
-        if (headerCells[key]) {
+        if (headerCells[key] && !initial && !cell.getAttribute('data-width')) {
           headerCells[key].style.width = cellWidth + 'px';
         }
       });
@@ -72,7 +77,7 @@ function stickyTableHeader(table, scrollParent = document.body) {
 
     stickyTable.appendChild(clonedThead);
     table.parentNode.insertBefore(stickyTable, table);
-    setWidth();
+    setWidth(0, true);
   }
 
   function eventListener (e) {

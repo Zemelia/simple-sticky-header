@@ -6,110 +6,240 @@
  * @param scrollParent
  *   Scroll parent element. Optional, document.body is default.
  */
-function stickyTableHeader(table, scrollParent = document.body) {
+function stickyTableHeader(table, scrollParent = document.body, mode = 'horizontal') {
   if (!table) {
     return;
   }
   const thead = table.getElementsByTagName('thead')[0];
-  if (!thead) {
+  const tbody = table.getElementsByTagName('tbody')[0];
+
+  if (!tbody) {
+    return
+  }
+  if (!thead && !isVertical) {
     return
   }
   const headerCells = thead.getElementsByTagName('th');
+  const isHorizontal = ['horizontal', 'both'].indexOf(mode) > -1;
+  const isVertical = ['vertical', 'both'].indexOf(mode) > -1;
   let resizeTimeout = null;
   let sticked = false;
-  let stickyTable = null;
+  let stickyTableHorizontal = null;
+  let stickyTableVertical = null;
   let widthModifier = 0;
-  let setWidthTimeout = null
+  let stickyHeadTimeout = null
+  let stickyColTimeout = null
+  let stickyTableWrapper = null;
+  let stickyTableVerticalHead = null;
 
-  function setWidth(timeout = 0, initial = false) {
-    clearTimeout(setWidthTimeout);
+  function setWidth(timeout = 300, initial = false) {
+    clearTimeout(stickyHeadTimeout);
 
     const parentBox = scrollParent.getBoundingClientRect();
-    const stickyHeaderCells =  stickyTable.getElementsByTagName('th');
+    const stickyHeaderCells =  stickyTableHorizontal.getElementsByTagName('th');
+    const tableBox = stickyTableWrapper.getBoundingClientRect();
 
     // Refresh table cells width in case window resize, etc.
-      [].forEach.call(headerCells, (cell, key) => {
-        if (initial && cell.style.width) {
-          cell.setAttribute('data-width', cell.style.width)
-        }
-        else if (!cell.getAttribute('data-width')) {
-          cell.style.width = null;
-        }
-      });
+    [].forEach.call(headerCells, (cell, key) => {
+      if (initial && cell.style.width) {
+        cell.setAttribute('data-width', cell.style.width)
+      }
+      else if (!cell.getAttribute('data-width')) {
+        cell.style.width = null;
+      }
+    });
 
-    setWidthTimeout = setTimeout(() => {
+    stickyHeadTimeout = setTimeout(() => {
       // Set sticky table head width with modifier to prevent cells missalignment.
       const computedTheadStyle = window.getComputedStyle(thead)
-      const theadWidth = parseFloat(computedTheadStyle.getPropertyValue('width'));
+      const stickyTableThead = stickyTableHorizontal.getElementsByTagName('thead')[0];
+      const theadWidth = parseFloat(computedTheadStyle.getPropertyValue('width')) + widthModifier;
 
       [].forEach.call(headerCells, (cell, key) => {
         const computedCellStyle = window.getComputedStyle(cell);
         const cellWidth = parseFloat(computedCellStyle.getPropertyValue('width'));
         stickyHeaderCells[key].style.width = cellWidth + 'px';
-        if (headerCells[key] && !initial && !cell.getAttribute('data-width')) {
+        if (headerCells[key] && !cell.getAttribute('data-width')) {
           headerCells[key].style.width = cellWidth + 'px';
         }
       });
-      stickyTable.getElementsByTagName('thead')[0].style.width = (theadWidth + widthModifier) + 'px';
+      stickyTableThead.style.width = theadWidth + 'px';
+
       // Set sticky table dynamic styles.
-      stickyTable.style.width = table.offsetWidth + 'px';
-      stickyTable.style.left = (table.offsetLeft + parentBox.left) + 'px';
-      stickyTable.style.top = parentBox.top + 'px';
-    }, timeout)
+      stickyTableHorizontal.style.width = table.offsetWidth + 'px';
+      stickyTableHorizontal.style.left = tableBox.left + 'px';
+      stickyTableHorizontal.style.top = parentBox.top + 'px';
+      stickyTableThead.style.display = (theadWidth > table.offsetWidth) ? 'block' : null;
+    }, timeout);
   }
 
   function prepareHeader() {
     const clonedThead = thead.cloneNode(true);
     // Get border width as modifier to prevent misalignment with cells.
     widthModifier = headerCells[0] ? headerCells[0].offsetWidth - headerCells[0].clientWidth : 0;
-    stickyTable = document.createElement('table');
+    stickyTableHorizontal = document.createElement('table');
 
     // Set base styles for sticky table.
-    stickyTable.style.position = 'fixed';
-    stickyTable.style.overflow = 'hidden';
-    stickyTable.style.display = 'none';
-    stickyTable.classList.add('sticky-table');
-    stickyTable.style.pointerEvents = 'none';
+    Object.assign(stickyTableHorizontal.style, {
+      position: 'fixed',
+      overflow: 'hidden',
+      display: 'none',
+      pointerEvents: 'none',
+      zIndex: 2
+    })
+    stickyTableHorizontal.classList.add('sticky-table');
 
     // Set base styles for sticky table's head.
-    clonedThead.style.display = 'block';
     clonedThead.style.transition = 'none';
 
-    stickyTable.appendChild(clonedThead);
-    table.parentNode.insertBefore(stickyTable, table);
-    setWidth(0, true);
+    stickyTableHorizontal.appendChild(clonedThead);
+    table.parentNode.insertBefore(stickyTableHorizontal, table);
+    setWidth(300, true);
+  }
+
+  function setColumnWidth(timeout = 300) {
+    if (stickyTableVertical) {
+      clearTimeout(stickyColTimeout);
+
+      stickyColTimeout = setTimeout(() => {
+        const varticalTableTRs = stickyTableVertical.getElementsByTagName('tr');
+        [].forEach.call(varticalTableTRs, (tr, rowKey) => {
+          console.log(tr.parentNode);
+          const parentNode = (tr.parentNode.nodeName.toLowerCase() === 'thead') ? thead : tbody;
+          [].forEach.call(tr.children, (cell, cellKey) => {
+            if (parentNode.children[rowKey] && parentNode.children[rowKey].children[cellKey]) {
+              const computedCellStyle = window.getComputedStyle(parentNode.children[rowKey].children[cellKey]);
+              cell.style.width = parseFloat(computedCellStyle.getPropertyValue('width')) + 'px';
+            }
+          });
+        });
+      }, timeout);
+    }
+  }
+
+  function prepareFixedColumn() {
+    if (!tbody.getElementsByTagName('th').length) {
+      return;
+    }
+    stickyTableVertical = document.createElement('table');
+    stickyTableVertical.classList.add('sticky-table-vertical')
+    const stickyTableVerticalBody = document.createElement('tbody');
+    const bodyTRs = tbody.getElementsByTagName('tr');
+    let cols = 0
+    while (bodyTRs[0].children[cols].nodeName.toLowerCase() === 'th') {
+      cols++;
+    }
+    if (cols) {
+      function generateRows(rows, rowsContainer) {
+        [].forEach.call(rows, (row, key) => {
+          const newTr = document.createElement('tr');
+          for (let i = 0; i < cols; i++) {
+            const col = row.children[i];
+            if (col) {
+              newTr.appendChild(col.cloneNode(true));
+            }
+          }
+          rowsContainer.appendChild(newTr);
+        });
+      }
+      generateRows(tbody.getElementsByTagName('tr'), stickyTableVerticalBody);
+      if (thead) {
+        stickyTableVerticalHead = document.createElement('thead');
+        generateRows(thead.getElementsByTagName('tr'), stickyTableVerticalHead);
+        Object.assign(stickyTableVerticalHead.style, {
+          left: 0,
+          top: 0,
+          transition: 'none'
+        });
+        stickyTableVertical.appendChild(stickyTableVerticalHead);
+      }
+      stickyTableVertical.appendChild(stickyTableVerticalBody);
+    }
+    Object.assign(stickyTableVertical.style, {
+      position: 'absolute',
+      bottom: 0,
+      left: 0,
+      margin: 0,
+      zIndex: 3,
+      display: 'none',
+      overflow: 'visible',
+      transition: 'none'
+    })
+
+    table.parentNode.insertBefore(stickyTableVertical, table);
+    setColumnWidth();
   }
 
   function eventListener (e) {
-    const offsetTop = table.offsetTop;
-    let topStickOffset = offsetTop;
-    let bottomStickOffset = offsetTop + table.offsetHeight - thead.offsetHeight;
-    if (offsetTop - scrollParent.scrollTop < 0 && bottomStickOffset > scrollParent.scrollTop) {
+    const offsetTop = stickyTableWrapper.offsetTop;
+    const bottomStickOffset = offsetTop + table.offsetHeight - thead.offsetHeight;
+    const topStickOffset = offsetTop - scrollParent.scrollTop;
+    if (topStickOffset < 0 && bottomStickOffset > scrollParent.scrollTop) {
       sticked = true;
-      stickyTable.style.display = null;
+      stickyTableHorizontal.style.display = null;
+
+      if (stickyTableVerticalHead) {
+        stickyTableVertical.style.paddingTop = thead.offsetHeight + 'px';
+        stickyTableVertical.classList.add('head-sticked');
+        Object.assign(stickyTableVerticalHead.style, {
+          transform: 'translate3d(0px, ' + Math.abs(topStickOffset) + 'px, 0px)',
+          position: 'absolute'
+        });
+      }
     }
-    if (sticked === true && (topStickOffset - scrollParent.scrollTop > 0 || bottomStickOffset < scrollParent.scrollTop)) {
+    if (sticked === true && (topStickOffset > 0 || bottomStickOffset < scrollParent.scrollTop)) {
       sticked = false;
-      stickyTable.style.display = 'none';
+      stickyTableHorizontal.style.display = 'none';
+      if (stickyTableVerticalHead) {
+        stickyTableVertical.style.paddingTop = null;
+        stickyTableVertical.classList.remove('head-sticked');
+        Object.assign(stickyTableVerticalHead.style, {
+          transform: null,
+          position: null
+        });
+      }
     }
   }
 
+  stickyTableWrapper = document.createElement('div');
+  stickyTableWrapper.classList.add('sticky-table-wrapper');
+  stickyTableWrapper.style.position = 'relative';
+  table.parentNode.insertBefore(stickyTableWrapper, table);
+  stickyTableWrapper.appendChild(table);
+
   // Prepare header with base styles and html.
-  prepareHeader();
+  if (isHorizontal && thead) {
+    prepareHeader();
+  }
+
+  // Prepare vertical sticky column.
+  if (isVertical && tbody) {
+    prepareFixedColumn();
+  }
 
   // Start listen for parent scroll.
   scrollParent.addEventListener('scroll', eventListener);
 
   // Table scroll event, to have same scrollLeft position for sticky table based on parent one.
   table.addEventListener('scroll', (e) => {
-    stickyTable.scrollLeft = table.scrollLeft
+    stickyTableHorizontal.scrollLeft = table.scrollLeft;
+    // Scroll event handler for vertical sticky table if exists.
+    if (stickyTableVertical) {
+      if (table.scrollLeft) {
+        stickyTableVertical.style.display = null;
+      }
+      else {
+        stickyTableVertical.style.display = 'none';
+      }
+    }
   });
 
   // Resize with debounce to update widths.
   function resizeDebounce() {
     clearTimeout(resizeTimeout);
     resizeTimeout = setTimeout(() => {
-      setWidth(300);
+      setWidth();
+      setColumnWidth();
     }, 500);
   }
   window.addEventListener('resize', resizeDebounce);

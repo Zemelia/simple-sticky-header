@@ -23,3 +23,8 @@ Table element.
 
 #### `scrollParent`
 Scroll parent element. Optional, document.body is default.
+
+#### `mode`
+Sticky table mode, can be applied as horizontal or vertical (left columns sticked) or for both.
+Vertical sticky column applicable only to first N columns with cells as `<th>` in tbody.
+Possible modes are 'horizontal', 'vertical', 'both'. Default: 'horizontal'.

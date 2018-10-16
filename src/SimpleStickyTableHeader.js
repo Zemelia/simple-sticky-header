@@ -104,7 +104,6 @@ function stickyTableHeader(table, scrollParent = document.body, mode = 'horizont
       stickyColTimeout = setTimeout(() => {
         const varticalTableTRs = stickyTableVertical.getElementsByTagName('tr');
         [].forEach.call(varticalTableTRs, (tr, rowKey) => {
-          console.log(tr.parentNode);
           const parentNode = (tr.parentNode.nodeName.toLowerCase() === 'thead') ? thead : tbody;
           [].forEach.call(tr.children, (cell, cellKey) => {
             if (parentNode.children[rowKey] && parentNode.children[rowKey].children[cellKey]) {

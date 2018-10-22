@@ -182,6 +182,9 @@ function stickyTableHeader(table, scrollParent = document.body, mode = 'horizont
     if (topStickOffset < 0 && bottomStickOffset > scrollParent.scrollTop) {
       sticked = true;
       stickyTableHorizontal.style.display = null;
+      if (table.scrollLeft !== stickyTableHorizontal.scrollLeft) {
+        stickyTableHorizontal.scrollLeft = table.scrollLeft;
+      }
 
       if (stickyTableVerticalHead) {
         stickyTableVertical.style.paddingTop = thead.offsetHeight + 'px';

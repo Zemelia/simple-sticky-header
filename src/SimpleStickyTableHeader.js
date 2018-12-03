@@ -256,12 +256,13 @@ function stickyTableHeader(table, inputOptions = {}) {
   });
 
   // Resize with debounce to update widths.
-  function resizeDebounce() {
+  function resizeDebounce(e) {
+    const timeout = (e.detail && e.detail.timeout) ? e.detail.timeout : 500;
     clearTimeout(resizeTimeout);
     resizeTimeout = setTimeout(() => {
       setWidth();
       setColumnWidth();
-    }, 500);
+    }, timeout);
   }
   window.addEventListener('resize', resizeDebounce);
 }

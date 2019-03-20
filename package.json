@@ -1,32 +1,32 @@
 {
-  "name": "simple-sticky-table-header",
-  "version": "0.1.8",
-  "description": "Simple Sticky Table Header",
-  "main": "./dist/SimpleStickyTableHeader.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "babel src --presets babel-preset-es2015 --out-dir dist",
-    "prepublish": "npm run build"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/Zemelia/simple-sticky-header.git"
-  },
-  "keywords": [
-    "table",
-    "header",
-    "sticky",
-    "vanilla JS"
-  ],
-  "author": "Oleh Raban (@Zemelia)",
-  "license": "MIT",
-  "bugs": {
-    "url": "https://github.com/Zemelia/simple-sticky-header/issues"
-  },
-  "homepage": "https://github.com/Zemelia/simple-sticky-header#readme",
-  "devDependencies": {
-    "babel-cli": "^6.26.0",
-    "babel-core": "^6.26.3",
-    "babel-preset-es2015": "^6.24.1"
-  }
+	"name": "simple-sticky-table-header",
+	"version": "0.1.9",
+	"description": "Simple Sticky Table Header",
+	"main": "./dist/SimpleStickyTableHeader.js",
+	"scripts": {
+		"test": "echo \"Error: no test specified\" && exit 1",
+		"build": "babel src --presets babel-preset-es2015 --out-dir dist",
+		"prepublish": "npm run build"
+	},
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/Zemelia/simple-sticky-header.git"
+	},
+	"keywords": [
+		"table",
+		"header",
+		"sticky",
+		"vanilla JS"
+	],
+	"author": "Oleh Raban (@Zemelia)",
+	"license": "MIT",
+	"bugs": {
+		"url": "https://github.com/Zemelia/simple-sticky-header/issues"
+	},
+	"homepage": "https://github.com/Zemelia/simple-sticky-header#readme",
+	"devDependencies": {
+		"babel-cli": "^6.26.0",
+		"babel-core": "^6.26.3",
+		"babel-preset-es2015": "^6.24.1"
+	}
 }

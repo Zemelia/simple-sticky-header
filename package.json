@@ -1,6 +1,6 @@
 {
 	"name": "simple-sticky-table-header",
-	"version": "0.1.9",
+	"version": "0.1.10",
 	"description": "Simple Sticky Table Header",
 	"main": "./dist/SimpleStickyTableHeader.js",
 	"scripts": {

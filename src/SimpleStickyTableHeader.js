@@ -44,22 +44,8 @@ function stickyTableHeader(table, inputOptions = {}) {
   let stickyTableVerticalHead = null;
 
   function setWidth(timeout = 300, initial = false) {
-    clearTimeout(stickyHeadTimeout);
-
-    const parentBox = options.scrollParent.getBoundingClientRect();
-    const stickyHeaderCells = stickyTableHorizontal.getElementsByTagName('th');
-    const tableBox = stickyTableWrapper.getBoundingClientRect();
-
-    // Refresh table cells width in case window resize, etc.
-    [].forEach.call(headerCells, cell => {
-      if (initial && cell.style.width) {
-        cell.setAttribute('data-width', cell.style.width);
-      } else if (!cell.getAttribute('data-width')) {
-        cell.style.width = null;
-      }
-    });
-
-    stickyHeadTimeout = setTimeout(() => {
+    // Function to apply sticky table width, etc.
+    function applyWidth() {
       // Set sticky table head width with modifier to prevent cells misalignment.
       const theadWidth = thead.offsetWidth + widthModifier;
 
@@ -108,6 +94,25 @@ function stickyTableHeader(table, inputOptions = {}) {
       stickyTableHorizontal.style.left = `${tableBox.left}px`;
       stickyTableHorizontal.style.top = `${parentBox.top}px`;
       stickyTableThead.style.display = theadWidth > table.offsetWidth ? 'block' : null;
+      scrollEventListener();
+    }
+    clearTimeout(stickyHeadTimeout);
+
+    const parentBox = options.scrollParent.getBoundingClientRect();
+    const stickyHeaderCells = stickyTableHorizontal.getElementsByTagName('th');
+    const tableBox = stickyTableWrapper.getBoundingClientRect();
+
+    // Refresh table cells width in case window resize, etc.
+    [].forEach.call(headerCells, cell => {
+      if (initial && cell.style.width) {
+        cell.setAttribute('data-width', cell.style.width);
+      } else if (!cell.getAttribute('data-width')) {
+        cell.style.width = null;
+      }
+    });
+    applyWidth();
+    stickyHeadTimeout = setTimeout(() => {
+      applyWidth();
     }, timeout);
   }
 
@@ -231,7 +236,7 @@ function stickyTableHeader(table, inputOptions = {}) {
     return theadOffset;
   }
 
-  function eventListener() {
+  function scrollEventListener() {
     const offsetTop = stickyTableWrapper.offsetTop;
     const bottomStickOffset = offsetTop + table.offsetHeight - thead.offsetHeight;
     const topStickOffset = offsetTop - options.scrollParent.scrollTop;
@@ -295,7 +300,7 @@ function stickyTableHeader(table, inputOptions = {}) {
     prepareFixedColumn();
   }
   // Start listen for parent scroll.
-  options.scrollParent.addEventListener('scroll', eventListener);
+  options.scrollParent.addEventListener('scroll', scrollEventListener);
 
   // Table scroll event, to have same scrollLeft position for sticky table based on parent one.
   table.addEventListener('scroll', () => {

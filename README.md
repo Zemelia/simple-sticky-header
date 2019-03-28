@@ -35,3 +35,7 @@ Default: 'horizontal'.
 ##### `noWrapper`
 Don't wrap table in extra element. If TRUE it will use existing one.
 Default: false
+
+##### `horizontalAddHeight`
+Additional height for horizontal sticky table wrapper. In example needed if you have some border in thead.
+Default: 0

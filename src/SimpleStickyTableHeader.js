@@ -17,7 +17,7 @@ function stickyTableHeader(table, inputOptions = {}) {
   const options = Object.assign({}, defaults, inputOptions);
   const isHorizontal = ['horizontal', 'both'].indexOf(options.mode) > -1;
   const isVertical = ['vertical', 'both'].indexOf(options.mode) > -1;
-  const horizontalAddHeight = options.horizontalAddHeight;
+  const {horizontalAddHeight} = options;
 
   if (!table) {
     return;
@@ -38,7 +38,6 @@ function stickyTableHeader(table, inputOptions = {}) {
   let sticked = false;
   let stickyTableHorizontal = null;
   let stickyTableHorizontalWrapper = null;
-  let stickyTableThead = null;
   let stickyTableVertical = null;
   let stickyHeadTimeout = null;
   let stickyColTimeout = null;
@@ -50,7 +49,7 @@ function stickyTableHeader(table, inputOptions = {}) {
     function applyWidth() {
       // Set sticky table dynamic styles.
       const computedTableStyle = window.getComputedStyle(table);
-      const tableWidth = parseFloat(computedTableStyle.getPropertyValue('width'))
+      const tableWidth = parseFloat(computedTableStyle.getPropertyValue('width'));
       stickyTableHorizontalWrapper.style.width = `${tableWidth}px`;
       stickyTableHorizontalWrapper.style.left = `${tableBox.left}px`;
       stickyTableHorizontalWrapper.style.top = `${parentBox.top}px`;
@@ -78,8 +77,8 @@ function stickyTableHeader(table, inputOptions = {}) {
       overflow: 'hidden',
       display: 'none',
       pointerEvents: 'none',
-      height: thead.offsetHeight + horizontalAddHeight + 'px',
-      zIndex: 2
+      height: `${thead.offsetHeight + horizontalAddHeight}px`,
+      zIndex: 2,
     });
     stickyTableHorizontal.classList.add('sticky-table');
     stickyTableHorizontalWrapper.classList.add('sticky-horizontal-wrapper');
@@ -101,7 +100,7 @@ function stickyTableHeader(table, inputOptions = {}) {
           [].forEach.call(tr.children, (cell, cellKey) => {
             if (parent.children[rowKey] && parent.children[rowKey].children[cellKey]) {
               const computedCellStyle = window.getComputedStyle(
-                parent.children[rowKey].children[cellKey]
+                parent.children[rowKey].children[cellKey],
               );
               cell.style.width = `${parseFloat(computedCellStyle.getPropertyValue('width'))}px`;
               cell.style.height = `${parseFloat(computedCellStyle.getPropertyValue('height'))}px`;
@@ -134,7 +133,7 @@ function stickyTableHeader(table, inputOptions = {}) {
     }
     if (cols) {
       function generateRows(rows, rowsContainer) {
-        [].forEach.call(rows, row => {
+        [].forEach.call(rows, (row) => {
           const newTr = document.createElement('tr');
           for (let i = 0; i < cols; i++) {
             const col = row.children[i];
@@ -152,7 +151,7 @@ function stickyTableHeader(table, inputOptions = {}) {
         Object.assign(stickyTableVerticalHead.style, {
           left: 0,
           top: 0,
-          transition: 'none'
+          transition: 'none',
         });
         stickyTableVertical.appendChild(stickyTableVerticalHead);
       }
@@ -166,7 +165,7 @@ function stickyTableHeader(table, inputOptions = {}) {
       zIndex: 3,
       display: 'none',
       overflow: 'visible',
-      transition: 'none'
+      transition: 'none',
     });
 
     table.parentNode.appendChild(stickyTableVertical);
@@ -190,16 +189,16 @@ function stickyTableHeader(table, inputOptions = {}) {
   }
 
   function scrollEventListener() {
-    const offsetTop = stickyTableWrapper.offsetTop;
+    const {offsetTop} = stickyTableWrapper;
     const bottomStickOffset = offsetTop + table.offsetHeight - thead.offsetHeight;
     const topStickOffset = offsetTop - options.scrollParent.scrollTop;
-    let theadOffset = getTheadOffset();
+    const theadOffset = getTheadOffset();
     if (
-      topStickOffset + theadOffset < 0 &&
-      bottomStickOffset + theadOffset > options.scrollParent.scrollTop
+      topStickOffset + theadOffset < 0
+      && bottomStickOffset + theadOffset > options.scrollParent.scrollTop
     ) {
       sticked = true;
-      stickyTableHorizontalWrapper.style.display = null;
+      stickyTableHorizontalWrapper.style.removeProperty('display');
       if (table.scrollLeft !== stickyTableHorizontal.scrollLeft) {
         stickyTableHorizontal.scrollLeft = table.scrollLeft;
       }
@@ -209,13 +208,13 @@ function stickyTableHeader(table, inputOptions = {}) {
         stickyTableVertical.classList.add('head-sticked');
         Object.assign(stickyTableVerticalHead.style, {
           transform: `translate3d(0px, ${Math.abs(topStickOffset) - theadOffset}px, 0px)`,
-          position: 'absolute'
+          position: 'absolute',
         });
       }
     }
     if (
-      sticked === true &&
-      (topStickOffset > 0 || bottomStickOffset < options.scrollParent.scrollTop)
+      sticked === true
+      && (topStickOffset > 0 || bottomStickOffset < options.scrollParent.scrollTop)
     ) {
       sticked = false;
       stickyTableHorizontalWrapper.style.display = 'none';
@@ -224,7 +223,7 @@ function stickyTableHeader(table, inputOptions = {}) {
         stickyTableVertical.classList.remove('head-sticked');
         Object.assign(stickyTableVerticalHead.style, {
           transform: null,
-          position: null
+          position: null,
         });
       }
     }
@@ -257,7 +256,7 @@ function stickyTableHeader(table, inputOptions = {}) {
 
   // Table scroll event, to have same scrollLeft position for sticky table based on parent one.
   table.addEventListener('scroll', () => {
-    let scrollLeft = table.scrollLeft;
+    const {scrollLeft} = table;
     // We need this
     if (scrollLeft && table.offsetWidth + scrollLeft >= table.scrollWidth) {
       stickyTableHorizontal.style.marginLeft = '-1px';
@@ -269,8 +268,9 @@ function stickyTableHeader(table, inputOptions = {}) {
     // Scroll event handler for vertical sticky table if exists.
     if (stickyTableVertical) {
       if (scrollLeft) {
-        stickyTableVertical.style.display = null;
-      } else {
+        stickyTableVertical.style.removeProperty('display');
+      }
+      else {
         stickyTableVertical.style.display = 'none';
       }
     }

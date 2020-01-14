@@ -102,8 +102,8 @@ function stickyTableHeader(table, inputOptions = {}) {
               const computedCellStyle = window.getComputedStyle(
                 parent.children[rowKey].children[cellKey],
               );
-              cell.style.width = `${parseFloat(computedCellStyle.getPropertyValue('width'))}px`;
-              cell.style.height = `${parseFloat(computedCellStyle.getPropertyValue('height'))}px`;
+              cell.style.width = `${parent.children[rowKey].children[cellKey].offsetWidth}px`;
+              cell.style.height = `${parent.children[rowKey].children[cellKey].offsetHeight}px`;
             }
           });
         });
@@ -220,11 +220,10 @@ function stickyTableHeader(table, inputOptions = {}) {
       stickyTableHorizontalWrapper.style.display = 'none';
       if (stickyTableVerticalHead) {
         stickyTableVertical.style.paddingTop = null;
+        stickyTableVertical.style.removeProperty('paddingTop');
         stickyTableVertical.classList.remove('head-sticked');
-        Object.assign(stickyTableVerticalHead.style, {
-          transform: null,
-          position: null,
-        });
+        stickyTableVerticalHead.style.removeProperty('transform');
+        stickyTableVerticalHead.style.removeProperty('position');
       }
     }
   }
@@ -263,6 +262,7 @@ function stickyTableHeader(table, inputOptions = {}) {
     }
     else {
       stickyTableHorizontal.style.marginLeft = null;
+      stickyTableHorizontal.style.removeProperty('marginLeft');
     }
     stickyTableHorizontal.scrollLeft = scrollLeft;
     // Scroll event handler for vertical sticky table if exists.
